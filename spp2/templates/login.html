@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPP — Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 50%, #1a8a6e 100%);
+      display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .login-wrapper { width: 100%; max-width: 440px; }
+
+    .login-brand { text-align: center; color: #fff; margin-bottom: 1.5rem; }
+    .login-logo {
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; margin: 0 auto 1rem;
+    }
+    .login-brand h1 { font-size: 1.4rem; font-weight: 700; margin: 0; }
+    .login-brand p  { opacity: 0.8; font-size: 0.9rem; margin: 4px 0 0; }
+
+    .role-tabs {
+      display: flex; background: rgba(255,255,255,0.12);
+      border-radius: 14px; padding: 5px; gap: 4px; margin-bottom: 1rem;
+    }
+    .role-tab {
+      flex: 1; padding: 9px 6px; border: none; border-radius: 10px;
+      background: transparent; color: rgba(255,255,255,0.7);
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      transition: all 200ms; display: flex; align-items: center;
+      justify-content: center; gap: 5px;
+    }
+    .role-tab.active { background: #fff; color: #1e3a5f; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+
+    .login-card {
+      background: #fff; border-radius: 20px;
+      padding: 2rem 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .role-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; font-weight: 700;
+      padding: 5px 14px; border-radius: 99px; margin-bottom: 1.25rem;
+    }
+    .badge-admin   { background: #ede9fe; color: #6366f1; }
+    .badge-company { background: #dbeafe; color: #1d4ed8; }
+    .badge-student { background: #dcfce7; color: #16a34a; }
+
+    .form-label { font-weight: 500; font-size: 0.9rem; }
+    .btn-login {
+      height: 46px; font-weight: 600; font-size: 1rem;
+      border: none; border-radius: 10px;
+      background: linear-gradient(135deg, #1e3a5f, #2d6a9f);
+      transition: opacity 200ms;
+    }
+    .btn-login:hover { opacity: 0.9; }
+    .login-hint { font-size: 0.78rem; color: #9ca3af; text-align: center; }
+    .login-hint code { background: #f3f4f8; padding: 1px 5px; border-radius: 4px; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+
+    <div class="login-brand">
+      <div class="login-logo"><i class="bi bi-briefcase-fill"></i></div>
+      <h1>Student Placement Portal</h1>
+      <p>Select your role and sign in</p>
+    </div>
+
+    <div class="role-tabs">
+      <button class="role-tab active" id="tabAdmin"   onclick="switchRole('admin')">
+        <i class="bi bi-shield-lock-fill"></i> Admin
+      </button>
+      <button class="role-tab"        id="tabCompany" onclick="switchRole('company')">
+        <i class="bi bi-building-fill"></i> Company
+      </button>
+      <button class="role-tab"        id="tabStudent" onclick="switchRole('student')">
+        <i class="bi bi-person-fill"></i> Student
+      </button>
+    </div>
+
+    <div class="login-card">
+      <div class="role-badge badge-admin" id="roleBadge">
+        <i class="bi bi-shield-lock-fill" id="roleIcon"></i>
+        <span id="roleBadgeText">Placement Officer Login</span>
+      </div>
+
+      <input type="hidden" id="selectedRole" value="admin" />
+
+      <div class="mb-3">
+        <label class="form-label" for="inputUser">Username</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person"></i></span>
+          <input id="inputUser" type="text" class="form-control"
+                 placeholder="Enter username" autocomplete="username" />
+        </div>
+        <div class="form-text" id="usernameHint">Placement officer username</div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="inputPass">Password</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input id="inputPass" type="password" class="form-control"
+                 placeholder="Enter password" autocomplete="current-password" />
+          <button class="btn btn-outline-secondary" type="button" id="togglePass">
+            <i class="bi bi-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="loginError" class="alert alert-danger py-2 d-none"></div>
+
+      <button id="loginBtn" class="btn btn-primary btn-login w-100" type="button">
+        <span id="loginBtnText">Sign In</span>
+        <span id="loginSpinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
+      </button>
+
+      <p class="login-hint mt-3" id="loginHint">
+        <i class="bi bi-info-circle me-1"></i>
+        Default: <code>admin</code> / <code>admin123</code>
+      </p>
+    </div>
+
+  </div>
+<script>
+const roles = {
+  admin:   { badge:'badge-admin',   icon:'bi-shield-lock-fill', label:'Placement Officer Login', hint:'Default: <code>admin</code> / <code>admin123</code>', uHint:'Placement officer username' },
+  company: { badge:'badge-company', icon:'bi-building-fill',    label:'Company Login',           hint:'Username & password provided by admin', uHint:'Company username (e.g. tcs)' },
+  student: { badge:'badge-student', icon:'bi-person-fill',      label:'Student Login',           hint:'Username & password = Roll Number lowercase (e.g. <code>cs2024001</code>)', uHint:'Your roll number (lowercase)' },
+};
+
+function switchRole(role) {
+  document.getElementById('selectedRole').value = role;
+  ['admin','company','student'].forEach(r =>
+    document.getElementById('tab'+r.charAt(0).toUpperCase()+r.slice(1)).classList.toggle('active', r===role));
+  const cfg = roles[role];
+  const badge = document.getElementById('roleBadge');
+  badge.className = 'role-badge ' + cfg.badge;
+  document.getElementById('roleIcon').className = 'bi ' + cfg.icon;
+  document.getElementById('roleBadgeText').textContent = cfg.label;
+  document.getElementById('loginHint').innerHTML = '<i class="bi bi-info-circle me-1"></i>' + cfg.hint;
+  document.getElementById('usernameHint').innerHTML = cfg.uHint;
+  document.getElementById('inputUser').value = '';
+  document.getElementById('inputPass').value = '';
+  document.getElementById('loginError').classList.add('d-none');
+  document.getElementById('inputUser').focus();
+}
+
+document.getElementById('togglePass').addEventListener('click', () => {
+  const p = document.getElementById('inputPass');
+  const hidden = p.type === 'password';
+  p.type = hidden ? 'text' : 'password';
+  document.getElementById('eyeIcon').className = hidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+});
+
+['inputUser','inputPass'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); }));
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+
+async function doLogin() {
+  const username = document.getElementById('inputUser').value.trim();
+  const password = document.getElementById('inputPass').value;
+  const role     = document.getElementById('selectedRole').value;
+  const errBox   = document.getElementById('loginError');
+  errBox.classList.add('d-none');
+  if (!username || !password) { errBox.textContent='Enter username and password.'; errBox.classList.remove('d-none'); return; }
+  setLoading(true);
+  try {
+    const res  = await fetch('/login', { method:'POST', headers:{'Content-Type':'application/json'},
+      credentials:'same-origin', body: JSON.stringify({username, password, role}) });
+    const data = await res.json();
+    if (data.success) { window.location.href = data.redirect; }
+    else { errBox.textContent = data.message||'Invalid credentials.'; errBox.classList.remove('d-none'); }
+  } catch { errBox.textContent='Network error.'; errBox.classList.remove('d-none'); }
+  finally { setLoading(false); }
+}
+function setLoading(on) {
+  document.getElementById('loginBtn').disabled = on;
+  document.getElementById('loginSpinner').classList.toggle('d-none', !on);
+  document.getElementById('loginBtnText').textContent = on ? 'Signing in…' : 'Sign In';
+}
+</script>
+</body>
+</html>
